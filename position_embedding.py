@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, Annotated
 import numpy as np
 import math
@@ -6,7 +6,7 @@ import math
 @dataclass
 class PositionEncodingMatrix:
     embedding_dim: Annotated[int, "Must be divisible by 2 (even number)"]
-    _position_matrix: np.ndarray = np.array([])
+    _position_matrix: np.ndarray = field(default_factory=lambda: np.array([]))
     
     @property
     def position_matrix(self):
@@ -17,6 +17,6 @@ class PositionEncodingMatrix:
             index = len(self._position_matrix)
             inner = token_id/(10000**(index/self.embedding_dim))
             encoding = math.cos(inner) if index % 2 == 0 else math.sin(inner)
-            np.append(self._position_matrix, encoding)
+            self._position_matrix = np.append(self._position_matrix, encoding)
         except Exception as e:
             raise e

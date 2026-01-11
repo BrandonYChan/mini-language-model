@@ -1,22 +1,32 @@
 from dataclasses import dataclass, field
-from typing import Dict, Annotated
+from typing import Annotated
 import numpy as np
-import math
 
 @dataclass
-class PositionEncodingMatrix:
+class PositionEncoder:
     embedding_dim: Annotated[int, "Must be divisible by 2 (even number)"]
-    _position_matrix: np.ndarray = field(default_factory=lambda: np.array([]))
+    sequence_length: Annotated[int, "Number of tokens in the sequence"]
+    _position_matrix: np.ndarray = field(default_factory=lambda: np.array([]).reshape(0, 0))
     
+    def __post_init__(self):
+        self._add_positions(self.sequence_length)
+
     @property
     def position_matrix(self):
         return self._position_matrix
     
-    def add_position(self, token_id: int) -> None:
-        try:
-            index = len(self._position_matrix)
-            inner = token_id/(10000**(index/self.embedding_dim))
-            encoding = math.cos(inner) if index % 2 == 0 else math.sin(inner)
-            self._position_matrix = np.append(self._position_matrix, encoding)
-        except Exception as e:
-            raise e
+    def _add_positions(self, num_positions: int) -> None:
+        """Generate positional encodings for positions 0 to num_positions-1."""
+        positions = np.arange(num_positions).reshape(-1, 1)
+        dimensions = np.arange(self.embedding_dim).reshape(1, -1)
+        
+        # PE(pos, 2i) = sin(pos / 10000^(2i/d_model))
+        # PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+        exponent = 2 * (dimensions // 2) / self.embedding_dim
+        denominator = 10000 ** exponent
+        
+        encoding = np.zeros((num_positions, self.embedding_dim))
+        encoding[:, 0::2] = np.sin(positions / denominator[:, 0::2])
+        encoding[:, 1::2] = np.cos(positions / denominator[:, 1::2])
+        
+        self._position_matrix = encoding

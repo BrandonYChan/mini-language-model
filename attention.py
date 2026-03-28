@@ -15,25 +15,28 @@ class Attention:
                           })
 
     def __post_init__(self):
-        self._init_qkv
+        self._init_qkv()
 
     def _init_qkv(self):
-        """Initialize QKV weights"""
         self.d_k = self.sequence_embedding.embedding_dim // self.num_heads
         bound = np.sqrt(6 / (self.sequence_embedding.embedding_dim + self.d_k))
         embedding_dim = self.sequence_embedding.embedding_dim
         sequence_length = self.sequence_embedding.sequence_length
 
-        for prefix in ['q' 'k', 'v']:
+        for prefix in ['q', 'k', 'v']:
             self.qkv[f"{prefix}_weights"] = np.random.uniform(-bound, bound, (embedding_dim , sequence_length))
-            self.qkv[prefix] = self.sequence_embedding.sequence_matrix @ self.qkv[f"{prefix}_weights"]
+            self.qkv[prefix] = self.sequence_embedding.embedding_matrix @ self.qkv[f"{prefix}_weights"]
 
-
-
-    def _softmax(self, class_logit, logits) -> np.ndarray:
-        return np.exp(class_logit) / np.sum(np.exp(logits))
+    def _softmax(self, logits) -> np.ndarray:
+        results = np.array([])
+        for logit in logits:
+            result = np.exp(logit) / np.sum(np.exp(logits))
+            results = np.vstack([results, result])
+        return results
 
     def _attention(self) -> np.ndarray:
-
-        return np.array([])
+        logits = self.qkv['q'] @ np.transpose(self.qkv['k']) / np.sqrt(self.d_k)
+        softmax_result = self._softmax(logits)
+        attention_result = softmax_result @ self.qkv['v']
+        return attention_result
     

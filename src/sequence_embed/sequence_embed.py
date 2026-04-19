@@ -5,8 +5,8 @@ import numpy as np
 @dataclass
 class SequenceEncoder:
     """Encode entire sequence of tokens"""
-    _embedding_dim: int
-    _sequence: List[str]
+    embedding_dim: int
+    sequence: List[str]
     _embedding_matrix: np.ndarray = field(default_factory=lambda: np.array([]).reshape(0, 0))
     _token_matrix: np.ndarray = field(default_factory=lambda: np.array([]).reshape(0, 0))
     _position_matrix: np.ndarray = field(default_factory=lambda: np.array([]).reshape(0, 0))
@@ -44,34 +44,3 @@ class SequenceEncoder:
             self._add_token(token)
         self._embedding_matrix = np.add(self._sequence_matrix, self._position_matrix)
     
-    @property
-    def sequence(self):
-        return self._sequence
-    
-    @property
-    def embedding_dim(self):
-        return self._embedding_dim
-    
-    @property
-    def sequence_length(self):
-        return len(self._sequence)
-    
-    @property
-    def embedding_matrix(self):
-        return self._embedding_matrix
-    
-    @property
-    def position_matrix(self):
-        return self._position_matrix
-
-    @property
-    def token_matrix(self) -> np.ndarray:
-        return self._token_matrix
-    
-    @property
-    def sequence_matrix(self) -> np.ndarray:
-        return self._sequence_matrix
-
-    @property
-    def token_map(self) -> Dict[str, int]:
-        return self._token_map

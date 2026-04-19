@@ -13,7 +13,7 @@ $$PE(pos, 2i) = \sin\left(\frac{pos}{10000^{\frac{2i}{d_{model}}}}\right)$$
 
 $$PE(pos, 2i + 1) = \cos\left(\frac{pos}{10000^{\frac{2i}{d_{model}}}}\right)$$
 
-## QKV Initialization
+## QKV Weight Initialization
 
 $$W_{ij} \sim U\left(-\sqrt{\frac{6}{d_{model}+d_k}}, \sqrt{\frac{6}{d_{model}+d_k}}\right)$$
 

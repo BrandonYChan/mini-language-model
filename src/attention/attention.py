@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import numpy as np
-from sequence_embed import SequenceEncoder
+from src.sequence_embed.sequence_embed import SequenceEncoder
 from typing import Dict
 
 @dataclass
